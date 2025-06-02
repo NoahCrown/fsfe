@@ -13,6 +13,12 @@ server.listen(3000, () => {
 
 process.on("SIGINT", () => {
 	console.log("Received SIGINT. Shutting down gracefully...");
+	wss.clients.forEach((client) => {
+		if (client.readyState === client.OPEN) {
+			client.send("Server is shutting down. Goodbye!");
+			client.close();
+		}
+	});
 	shutdownDb();
 	server.close(() => {
 		console.log("HTTP server closed.");
